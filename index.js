@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 3000;
@@ -22,11 +22,26 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
+    // database and collection
     const jobsCollection = client.db("Jop_portal").collection("jobs");
+    const applicationCollectin =  client.db("Jop_portal").collection("applayList")
 
+    app.post('/applications',async(req,res)=>{
+      const application = req.body;
+      const result = await applicationCollectin.insertOne(application);
+      res.send(result)
+    })
+    //  jobs api
     app.get("/jobs", async (req, res) => {
       const cursor = jobsCollection.find();
       const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/jobs/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id)};
+      const result = await jobsCollection.findOne(query);
       res.send(result);
     });
 

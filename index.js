@@ -25,10 +25,18 @@ async function run() {
     // database and collection
     const jobsCollection = client.db("Jop_portal").collection("jobs");
     const applicationCollectin =  client.db("Jop_portal").collection("applayList")
-
+//  application applay api 
     app.post('/applications',async(req,res)=>{
       const application = req.body;
       const result = await applicationCollectin.insertOne(application);
+      res.send(result)
+    })
+
+    // applicationList api 
+    app.get('/applications',async(req,res)=>{
+      const email = req.query.email
+      const query ={applicant:email}
+      const result = await applicationCollectin.find(query).toArray()
       res.send(result)
     })
     //  jobs api
@@ -37,7 +45,7 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
-
+  //  jobs api detaiels 
     app.get("/jobs/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id)};
